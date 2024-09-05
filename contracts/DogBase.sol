@@ -16,7 +16,7 @@ contract DogBase is Ownable, ERC721 {
   event DogIsFound(uint indexed tokenId, string indexed name);
 
   struct Dog {
-      string name
+      string name;
       string species;
       string breed;
       string sex;
@@ -24,7 +24,6 @@ contract DogBase is Ownable, ERC721 {
       string region;
       string city;
       string addr;
-      string lang;
       string email;
       string tatoo;
       string color;
@@ -46,8 +45,31 @@ contract DogBase is Ownable, ERC721 {
       address foundBy;
   }
 
+  struct Vaccine {
+    string name;
+    string supplier;
+    uint vatCenterId;
+    uint code;
+    uint date;
+    uint dueDate;
+  } 
+
+  struct VatCenter {
+    string name;
+    string country;
+    string region;
+    string city;
+    string addr;
+    string email;
+    uint phone;
+
+  }
+
+    VatCenter [] public vatCenters;
+
     mapping(uint => Dog) public dogs;
     mapping(uint => LostFoundDog)  public lostFoundDogs;
+    mapping(uint => Vaccine[]) public vaccines;
 
     constructor() ERC721("DogBaseToken", "DBT") {}
 
@@ -69,7 +91,6 @@ contract DogBase is Ownable, ERC721 {
                                                             string region,
                                                             string city,
                                                             string addr,
-                                                            string lang,
                                                             string email,
                                                             string tatoo,
                                                             string color,
@@ -87,7 +108,6 @@ contract DogBase is Ownable, ERC721 {
               dogs[_tokenId].region,
               dogs[_tokenId].city,
               dogs[_tokenId].addr,
-              dogs[_tokenId].lang,
               dogs[_tokenId].email,
               dogs[_tokenId].tatoo,
               dogs[_tokenId].color,
@@ -122,7 +142,13 @@ contract DogBase is Ownable, ERC721 {
         lostFoundDogs[_tokenId].foundBy
       )
     }
-    
+    /**
+     * @dev External view return vatCenters array.
+     */
+    function loockUpVatcenters() external view returns (VatCenter [] memory){
+        return vatCenters;
+    }
+
     /**
      * @dev Creates new entry for a dog.
      */
@@ -135,7 +161,6 @@ contract DogBase is Ownable, ERC721 {
                     string _region,
                     string _city,
                     string _addr,
-                    string _lang,
                     string _email,
                     string _tatoo,
                     string _color,
@@ -153,7 +178,6 @@ contract DogBase is Ownable, ERC721 {
         dogs[_tokenId].region = _region;
         dogs[_tokenId].city = _city;
         dogs[_tokenId].addr = _addr;
-        dogs[_tokenId].lang = _lang;
         dogs[_tokenId].email = _email;
         dogs[_tokenId].tatoo = _tatoo;
         dogs[_tokenId].color = _color;
@@ -176,7 +200,6 @@ contract DogBase is Ownable, ERC721 {
                     string _region,
                     string _city,
                     string _addr,
-                    string _lang,
                     string _email,
                     string _tatoo,
                     string _color,
@@ -186,14 +209,14 @@ contract DogBase is Ownable, ERC721 {
                     uint64 _otherPhone) public {
 
       reguire(dogs[_tokenId].name.length == 0,"This microchip has already been regestered");
-      _newDog(_chip,  _name, _species, _breed, _sex, _country, _region, _city, _addr, _lang, _email, _tatoo, _color, _birthday, _postalCode, _cellPhone, _otherPhone);
+      _newDog(_chip,  _name, _species, _breed, _sex, _country, _region, _city, _addr, _email, _tatoo, _color, _birthday, _postalCode, _cellPhone, _otherPhone);
       _safeMint(_owner,_chip);
     }
 
     /**
      * @dev Claim a dog is missing.
      */
-    function claimDogIsLost(uint _tokenId, uint _missingDate, string memory _country,  uint _missingDate, string memory _region, string memory _city) public ownerOf(_tokenId) {
+    function claimDogIsLost(uint _tokenId, uint _missingDate, string memory _country,  uint _missingDate, string memory _region, string memory _city) external ownerOf(_tokenId) {
         reguire(dogs[_tokenId].name.length > 0,"This dog has not yet been regestered.");
 
         lostFoundDogs[_tokenId].missingDate = _missingDate;
@@ -213,7 +236,7 @@ contract DogBase is Ownable, ERC721 {
      /**
      * @dev Claim a dog is found.
      */
-    function claimDogIsFound(uint _tokenId, uint _foundDate, uint _cellPhone, uint _otherPhone, string memory _email) public {
+    function claimDogIsFound(uint _tokenId, uint _foundDate, uint _cellPhone, uint _otherPhone, string memory _email) external {
         reguire(dogs[_tokenId].name.length > 0);
         
         lostFoundDogs[_tokenId].foundDate = _foundDate;
@@ -223,6 +246,13 @@ contract DogBase is Ownable, ERC721 {
         lostFoundDogs[_tokenId].email = _email;
 
         emit DogIsFound(_tokenId, dogs[_tokenId].name);
+    }
+
+     /**
+     * @dev Add dogs vaccination iformation.
+     */
+    function addVaccine(uint _tokenId, uint _vatCenterId, uint _date, uint _dueDate, uint _code, string memory _name, string memory _supplier) external ownerOf(_tokenId){
+        vaccines[_tokenId].push(Vaccine(_name, _supplier, _vatCenterId, _date, _dueDate, _code));
     }
 
 }
