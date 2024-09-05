@@ -1,10 +1,9 @@
 pragma solidity >=0.5.0 <0.8.21;
 
 import "./DogBaseHelper.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract DogBaseOwnership is DogBaseHelper, ERC721 {
-
+contract DogBaseOwnership is DogBaseHelper {
+/*
     mapping (uint => address) dogsApprovals;
 
     function balanceOf(address _owner) external view returns (uint256) {
@@ -31,8 +30,9 @@ contract DogBaseOwnership is DogBaseHelper, ERC721 {
       _transfer(_from, _to, _dogId);
     }
 
-    function approve(address _approved, uint256 _dogId) external payable onlyOwnerOf(_dogId) {
+    function approve(address _approved, uint256 _dogId) external payable ownerOf(_dogId) {
       dogsApprovals[_dogId] = _approved;
       emit Approval(msg.sender, _approved, _dogId);
     }
+*/
 }
