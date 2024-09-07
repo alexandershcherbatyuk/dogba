@@ -1,18 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "./DogBaseHelper.sol";
 
 /**
  * @title DogBase
  * @dev Main contract for dog database
  */
-contract DogBase is Ownable, ERC721 {
-  
-  string _tokenURI = "";
-  uint lostFoundFee = 0.001 ether;
-  uint marketFee = 0.001 ether;
+contract DogBase is DogBaseHelper  {
+
 
   event NewDoge(uint indexed tokenId, string indexed name);
   event DogIsLost(uint indexed tokenId, string indexed name);
@@ -28,18 +24,22 @@ contract DogBase is Ownable, ERC721 {
       string region;
       string city;
       string addr;
-      string email;
       string tatoo;
       string color;
       string photo;
-      uint32 birthday;
-      uint32 postalCode;
-      uint cellPhone;
-      uint otherPhone;
+      string postalCode;
+      uint birthday;
+  }
+
+  struct Contact {
+      string email;
+      string cellPhone;
+      string otherPhone;
   }
 
   struct LostDog {
       uint missingDate;
+      uint postalCode;
       string country;
       string region;
       string city;
@@ -48,38 +48,45 @@ contract DogBase is Ownable, ERC721 {
 
   struct FoundDog {
       uint foundDate;
-      uint cellPhone;
-      uint otherPhone;
-      string email;
       address foundBy;
   }
 
   struct Vaccine {
     string name;
     string supplier;
-    uint vatCenterId;
-    uint code;
+    string code;
+    uint vetCenterId;
     uint date;
     uint dueDate;
   } 
 
-  struct VatCenter {
+  struct VetCenter {
     string name;
     string country;
     string region;
     string city;
     string addr;
     string email;
-    uint phone;
+    string phone;
+    string postalCode;
   }
 
-    VatCenter [] public vatCenters;
+  struct Order {
+    uint price;
+    uint tokenId;
+    address dogOwner;
+  }
+
+    VetCenter [] public vetCenters;
+    Order [] public market;
 
     mapping(uint => Dog) public dogs;
     mapping(uint => LostDog[])  public lostDogs;
     mapping(uint => FoundDog[])  public foundDogs;
     mapping(uint => Vaccine[]) public vaccines;
-    mapping(uint => mapping(uint => address)) public vatCenterOfficials;
+    mapping(uint => mapping(uint => address)) public vetCenterOfficials;
+    mapping(address => Contact) public contacts;
+
 
     constructor() Ownable(msg.sender) ERC721("DogBaseToken", "DBT") {}
 
@@ -94,156 +101,38 @@ contract DogBase is Ownable, ERC721 {
     function _baseURI() internal view override returns (string memory) {
         return _tokenURI;
     }
-    /*
-    function loockUpDog2(uint _tokenId) external view return (Dog memory){
-      return dogs[_tokenId];
-    }
-    */
-
-    /**
-     * @dev External view function returns data about a dog.
-     */
-    /*
-    function loockUpDog(uint _tokenId) external view returns ( string name
-                                                            string species,
-                                                            string breed,
-                                                            string sex,
-                                                            string country,
-                                                            string region,
-                                                            string city,
-                                                            string addr,
-                                                            string email,
-                                                            string tatoo,
-                                                            string color,
-                                                            uint32 birthday,
-                                                            uint32 postalCode,
-                                                            uint cellPhone,
-                                                            uint otherPhone) {
-      
-
-      return( dogs[_tokenId].name
-              dogs[_tokenId].species,
-              dogs[_tokenId].breed,
-              dogs[_tokenId].sex,
-              dogs[_tokenId].country,
-              dogs[_tokenId].region,
-              dogs[_tokenId].city,
-              dogs[_tokenId].addr,
-              dogs[_tokenId].email,
-              dogs[_tokenId].tatoo,
-              dogs[_tokenId].color,
-              dogs[_tokenId].birthday,
-              dogs[_tokenId].postalCode,
-              dogs[_tokenId].cellPhone,
-              dogs[_tokenId].otherPhone);
-    }
-    */
-
-    /**
-     * @dev External view function returns data about lost and found dogs.
-     */
-    /*
-    function loockUpLostFoundDog(uint _tokenId) external view returns (      
-                                                                    uint missingDate,
-                                                                    uint foundDate,
-                                                                    uint cellPhone,
-                                                                    uint otherPhone,
-                                                                    string country,
-                                                                    string region,
-                                                                    string city,
-                                                                    string email,
-                                                                    address foundBy){
-      return(
-        lostFoundDogs[_tokenId].missingDate,
-        lostFoundDogs[_tokenId].foundDate,
-        lostFoundDogs[_tokenId].country,
-        lostFoundDogs[_tokenId].region,
-        lostFoundDogs[_tokenId].city,
-        lostFoundDogs[_tokenId].cellPhone,
-        lostFoundDogs[_tokenId].otherPhone,
-        lostFoundDogs[_tokenId].email,
-        lostFoundDogs[_tokenId].foundBy
-      )
-    }*/
-
-    /**
-     * @dev External view return vatCenters array.
-     */
-    /*
-    function loockUpVatcenters() external view returns (VatCenter [] memory){
-        return vatCenters;
-    }*/
-
+   
     /**
      * @dev Creates new entry for a dog.
      */
-    function _newDog(uint _tokenId,
-                    string memory _name,
-                    string memory _species,
-                    string memory _breed,
-                    string memory _sex,
-                    string memory _country,
-                    string memory _region,
-                    string memory _city,
-                    string memory _addr,
-                    string memory _email,
-                    string memory _tatoo,
-                    string memory _color,
-                    uint32 _birthday,
-                    uint32 _postalCode,
-                    uint64 _cellPhone,
-                    uint64 _otherPhone      
-    ) internal {
-
-        dogs[_tokenId].name = _name;
-        dogs[_tokenId].species = _species;
-        dogs[_tokenId].breed = _breed;
-        dogs[_tokenId].sex = _sex;
-        dogs[_tokenId].country = _country;
-        dogs[_tokenId].region = _region;
-        dogs[_tokenId].city = _city;
-        dogs[_tokenId].addr = _addr;
-        dogs[_tokenId].email = _email;
-        dogs[_tokenId].tatoo = _tatoo;
-        dogs[_tokenId].color = _color;
-        dogs[_tokenId].birthday = _birthday;
-        dogs[_tokenId].postalCode = _postalCode;
-        dogs[_tokenId].cellPhone = _cellPhone;
-        dogs[_tokenId].otherPhone = _otherPhone;
-      emit NewDoge(_tokenId, _name);
+    function _newDog(uint _tokenId, Dog memory _dog) internal {
+        dogs[_tokenId] = _dog;
+        emit NewDoge(_tokenId, _dog.name);
     }
+
+
     /**
      * @dev Regesters a dog, microchip id is unique, would be used as tokenId
      */
-    function regDoge(uint _chip, 
-                    string memory _name,
-                    string memory _species,
-                    string memory _breed,
-                    string memory _sex,
-                    string memory _country,
-                    string memory _region,
-                    string memory _city,
-                    string memory _addr,
-                    string memory _email,
-                    string memory _tatoo,
-                    string memory _color,
-                    uint32 _birthday,
-                    uint32 _postalCode,
-                    uint64 _cellPhone,
-                    uint64 _otherPhone) public {
-      require(bytes(_name).length > 0,"Dog name is required");
+    function regDoge(uint _chip, Dog memory _dog, Contact memory _contact) external {
+      //console.log("regDoge",_chip);
+      require(bytes(_dog.name).length > 0,"Dog name is required");
       require(bytes(dogs[_chip].name).length == 0,"This microchip has already been regestered");
-      _newDog(_chip,  _name, _species, _breed, _sex, _country, _region, _city, _addr, _email, _tatoo, _color, _birthday, _postalCode, _cellPhone, _otherPhone);
+      _newDog(_chip, _dog);
+      contacts[msg.sender] = _contact;
       _safeMint(msg.sender,_chip);
     }
 
     /**
      * @dev Claim a dog is missing.
      */
-    function claimDogIsLost(uint _tokenId, string memory _country,  uint _missingDate, string memory _region, string memory _city, string memory _addr) external dogOwner(_tokenId) {
+    function claimDogIsLost(uint _tokenId, LostDog memory _lostDog) external dogOwner(_tokenId) {
+
+        //console.log("claimDogIsLost");
         require(bytes(dogs[_tokenId].name).length > 0,"This dog has not yet been regestered.");
 
-        lostDogs[_tokenId].push(LostDog(block.timestamp, _country, _region, _city, _addr));
+        _lostDog.missingDate = block.timestamp;
+        lostDogs[_tokenId].push(_lostDog);
 
         emit DogIsLost(_tokenId, dogs[_tokenId].name);
     }
@@ -251,10 +140,12 @@ contract DogBase is Ownable, ERC721 {
      /**
      * @dev Claim a dog is found.
      */
-    function claimDogIsFound(uint _tokenId, uint _foundDate, uint _cellPhone, uint _otherPhone, string memory _email) external {
+    function claimDogIsFound(uint _tokenId, FoundDog memory _foundDog, Contact memory _contact) external {
         require(bytes(dogs[_tokenId].name).length > 0,"This dog has not yet been regestered.");
 
-        foundDogs[_tokenId].push(FoundDog(block.timestamp,_cellPhone, _otherPhone, _email, msg.sender));
+        _foundDog.foundDate = block.timestamp;
+        contacts[_foundDog.foundBy] = _contact;
+        foundDogs[_tokenId].push(_foundDog);
 
         emit DogIsFound(_tokenId, dogs[_tokenId].name);
     }
@@ -262,18 +153,36 @@ contract DogBase is Ownable, ERC721 {
      /**
      * @dev Add dogs vaccination iformation.
      */
-    function addVaccine(uint _tokenId, uint _vatCenterId, uint _date, uint _dueDate, uint _code, string memory _name, string memory _supplier) external dogOwner(_tokenId){
-        vaccines[_tokenId].push(Vaccine(_name, _supplier, _vatCenterId, _date, _dueDate, _code));
-        emit AddVaccine((vaccines[_tokenId].length - 1 ),_name,_tokenId);
+    function addVaccine(uint _tokenId, Vaccine memory _vaccine, uint _doctorId) external dogOwner(_tokenId){
+        require(vetCenterOfficials[_vaccine.vetCenterId][_doctorId] == msg.sender);
+        vaccines[_tokenId].push(_vaccine);
+        emit AddVaccine((vaccines[_tokenId].length - 1 ),_vaccine.name,_tokenId);
     }
 
-        /**
+    /**
      * @dev Payable function to reward a person who would found a dog.
      */
     function payReward(uint _tokenId, address _foundBy) external payable dogOwner(_tokenId) {
         require(msg.value == lostFoundFee);
         address payable _dogFounder = payable(_foundBy);//address(uint160((lostFoundDogs[_tokenId].dogFoundBy))); 
         _dogFounder.transfer(msg.value);
+    }
+
+    function regVetCenter(VetCenter memory _vetCenter) external {
+     //console.log("regVetCenter",_vetCenter.name);
+      vetCenters.push(_vetCenter);
+      //console.log("regVetCenter",vetCenters.length);
+
+       vetCenterOfficials[vetCenters.length - 1][0] = msg.sender;
+    }
+
+    function addOrder(uint _price, uint _tokenId, address _dogOwner) external dogOwner(_tokenId) {
+        market.push(Order(_price, _tokenId, _dogOwner));
+    }
+
+     function regVetCenterOfficial(uint _vetCenterId, uint _doctorId, address _doctor) external {
+        require(vetCenterOfficials[_vetCenterId][0] == msg.sender);
+        vetCenterOfficials[_vetCenterId][_doctorId] = _doctor;
     }
 
 }

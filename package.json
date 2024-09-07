@@ -4,7 +4,10 @@
   "description": "Database of dogs microchips",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "clean": "npx hardhat clean",
+    "deploy:morphTestnet": "npx hardhat run --network morphTestnet scripts/deploy.ts"
   },
   "author": "",
   "license": "ISC",
@@ -13,6 +16,8 @@
     "hardhat": "^2.22.9"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.0.2"
+    "@openzeppelin/contracts": "^5.0.2",
+    "dotenv": "^16.4.5",
+    "yarm": "^0.4.0"
   }
 }
