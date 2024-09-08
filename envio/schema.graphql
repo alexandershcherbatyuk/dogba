@@ -1,3 +1,9 @@
+type UserDogs {
+  id: ID!
+  owner: String!
+  dogsId: [BigInt!]!
+}
+
 type DogBase_AddVaccine {
   id: ID!
   vacId: BigInt!
@@ -27,6 +33,17 @@ type DogBase_CenterVet {
   name: String!
 }
 
+type DogBase_ConfirmDogFound {
+  id: ID!
+  tokenId: BigInt!
+}
+
+type DogBase_ConfitmMarketPlaceOrder {
+  id: ID!
+  tokenId: BigInt!
+  orderId: BigInt!
+}
+
 type DogBase_DogIsFound {
   id: ID!
   tokenId: BigInt!
@@ -45,6 +62,7 @@ type DogBase_MarketPlace {
   id: ID!
   tokenId: BigInt!
   price: BigInt!
+  orderId: BigInt!
 }
 
 type DogBase_NewDoge {
@@ -54,6 +72,7 @@ type DogBase_NewDoge {
   birthday: BigInt!
   breed: String!
   sex: String!
+  owner: String!
 }
 
 type DogBase_OwnershipTransferred {
@@ -67,22 +86,4 @@ type DogBase_Transfer {
   from: String!
   to: String!
   tokenId: BigInt!
-}
-
-type DogBase_ActiveDogOwner {
-  id: ID!
-  owner: String!
-  dogId: [ID!]
-}
-
-type DogBase_ActiveLostDod {
-  id: ID!
-  owner: String!
-  dogId: [ID!]
-}
-
-type DogBase_ActiveMarketOrder {
-  id: ID!
-  owner: String!
-  orderId: [ID!]
 }

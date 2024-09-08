@@ -1,3 +1,4 @@
+import { UserDogs_t } from '../generated/src/db/Entities.gen';
 /*
  * Please refer to https://docs.envio.dev for a thorough guide on all Envio indexer features
  */
@@ -7,13 +8,15 @@ import {
   DogBase_Approval,
   DogBase_ApprovalForAll,
   DogBase_CenterVet,
+  DogBase_ConfirmDogFound,
+  DogBase_ConfitmMarketPlaceOrder,
   DogBase_DogIsFound,
   DogBase_DogIsLost,
   DogBase_MarketPlace,
   DogBase_NewDoge,
   DogBase_OwnershipTransferred,
   DogBase_Transfer,
-} from "generated";
+} from 'generated';
 
 DogBase.AddVaccine.handler(async ({ event, context }) => {
   const entity: DogBase_AddVaccine = {
@@ -28,7 +31,6 @@ DogBase.AddVaccine.handler(async ({ event, context }) => {
   context.DogBase_AddVaccine.set(entity);
 });
 
-
 DogBase.Approval.handler(async ({ event, context }) => {
   const entity: DogBase_Approval = {
     id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
@@ -39,7 +41,6 @@ DogBase.Approval.handler(async ({ event, context }) => {
 
   context.DogBase_Approval.set(entity);
 });
-
 
 DogBase.ApprovalForAll.handler(async ({ event, context }) => {
   const entity: DogBase_ApprovalForAll = {
@@ -52,7 +53,6 @@ DogBase.ApprovalForAll.handler(async ({ event, context }) => {
   context.DogBase_ApprovalForAll.set(entity);
 });
 
-
 DogBase.CenterVet.handler(async ({ event, context }) => {
   const entity: DogBase_CenterVet = {
     id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
@@ -63,6 +63,24 @@ DogBase.CenterVet.handler(async ({ event, context }) => {
   context.DogBase_CenterVet.set(entity);
 });
 
+DogBase.ConfirmDogFound.handler(async ({ event, context }) => {
+  const entity: DogBase_ConfirmDogFound = {
+    id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
+    tokenId: event.params.tokenId,
+  };
+
+  context.DogBase_ConfirmDogFound.set(entity);
+});
+
+DogBase.ConfitmMarketPlaceOrder.handler(async ({ event, context }) => {
+  const entity: DogBase_ConfitmMarketPlaceOrder = {
+    id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
+    tokenId: event.params.tokenId,
+    orderId: event.params.orderId,
+  };
+
+  context.DogBase_ConfitmMarketPlaceOrder.set(entity);
+});
 
 DogBase.DogIsFound.handler(async ({ event, context }) => {
   const entity: DogBase_DogIsFound = {
@@ -75,7 +93,6 @@ DogBase.DogIsFound.handler(async ({ event, context }) => {
   context.DogBase_DogIsFound.set(entity);
 });
 
-
 DogBase.DogIsLost.handler(async ({ event, context }) => {
   const entity: DogBase_DogIsLost = {
     id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
@@ -87,17 +104,16 @@ DogBase.DogIsLost.handler(async ({ event, context }) => {
   context.DogBase_DogIsLost.set(entity);
 });
 
-
 DogBase.MarketPlace.handler(async ({ event, context }) => {
   const entity: DogBase_MarketPlace = {
     id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
     tokenId: event.params.tokenId,
     price: event.params.price,
+    orderId: event.params.orderId,
   };
 
   context.DogBase_MarketPlace.set(entity);
 });
-
 
 DogBase.NewDoge.handler(async ({ event, context }) => {
   const entity: DogBase_NewDoge = {
@@ -107,13 +123,23 @@ DogBase.NewDoge.handler(async ({ event, context }) => {
     birthday: event.params.birthday,
     breed: event.params.breed,
     sex: event.params.sex,
+    owner: event.params.owner,
   };
 
   context.DogBase_NewDoge.set(entity);
 
-  //let dogOwner = await context.User.get(event.params.user.toString());
+  let curUserDogs = await context.UserDogs.get(event.params.owner);
+  if (curUserDogs) {
+    curUserDogs?.dogsId.push(event.params.tokenId);
+  } else {
+    curUserDogs = {
+      id: event.params.owner,
+      owner: event.params.owner,
+      dogsId: [event.params.tokenId],
+    };
+  }
+  context.UserDogs.set(curUserDogs);
 });
-
 
 DogBase.OwnershipTransferred.handler(async ({ event, context }) => {
   const entity: DogBase_OwnershipTransferred = {
@@ -125,7 +151,6 @@ DogBase.OwnershipTransferred.handler(async ({ event, context }) => {
   context.DogBase_OwnershipTransferred.set(entity);
 });
 
-
 DogBase.Transfer.handler(async ({ event, context }) => {
   const entity: DogBase_Transfer = {
     id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
@@ -135,5 +160,28 @@ DogBase.Transfer.handler(async ({ event, context }) => {
   };
 
   context.DogBase_Transfer.set(entity);
-});
 
+  let fromUserDogs = await context.UserDogs.get(event.params.from);
+  if (fromUserDogs) {
+    fromUserDogs?.dogsId.filter((elem) => elem != event.params.tokenId);
+  } else {
+    fromUserDogs = {
+      id: event.params.from,
+      owner: event.params.from,
+      dogsId: [],
+    };
+  }
+  context.UserDogs.set(fromUserDogs);
+
+  let toUserDogs = await context.UserDogs.get(event.params.to);
+  if (toUserDogs) {
+    toUserDogs?.dogsId.push(event.params.tokenId);
+  } else {
+    toUserDogs = {
+      id: event.params.from,
+      owner: event.params.from,
+      dogsId: [event.params.tokenId],
+    };
+  }
+  context.UserDogs.set(toUserDogs);
+});
