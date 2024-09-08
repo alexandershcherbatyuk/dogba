@@ -14,11 +14,11 @@ networks:
     - event: AddVaccine(uint256 indexed vacId, string indexed name, uint256 indexed tokenId, uint256 vetCentraId, uint256 date)
     - event: Approval(address indexed owner, address indexed approved, uint256 indexed tokenId)
     - event: ApprovalForAll(address indexed owner, address indexed operator, bool approved)
-    - event: CenterVet(uint256 indexed vetCentraId, string indexed name)
-    - event: DogIsFound(uint256 indexed tokenId, string addr, uint256 date)
-    - event: DogIsLost(uint256 indexed tokenId, string addr, uint256 date)
-    - event: MarketPlace(uint256 indexed tokenId, uint256 price)
-    - event: NewDoge(uint256 indexed tokenId, string indexed name, uint256 birthday, string breed, string sex)
+    - event: CenterVet(uint256 indexed vetCentraId, string indexed name);
+    - event: DogIsFound(uint256 indexed tokenId, string addr, uint date)
+    - event: DogIsLost(uint256 indexed tokenId, string addr, uint date)
+    - event: NewDoge(uint256 indexed tokenId, string indexed name, uint256 birthday, string breed, string sex);
+    - event: MarketPlace(uint256 indexed tokenId, uint256 price);
     - event: OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
     - event: Transfer(address indexed from, address indexed to, uint256 indexed tokenId)
 rollback_on_reorg: false
