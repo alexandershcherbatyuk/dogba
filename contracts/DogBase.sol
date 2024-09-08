@@ -9,10 +9,13 @@ import "./DogBaseHelper.sol";
  */
 contract DogBase is DogBaseHelper  {
 
-    event NewDoge(uint indexed tokenId, string indexed name);
-    event DogIsLost(uint indexed tokenId, string indexed name);
-    event DogIsFound(uint indexed tokenId, string indexed name);
-    event AddVaccine(uint indexed vacId, string indexed name, uint indexed tokenId);
+    event NewDoge(uint indexed tokenId, string indexed name, uint birthday, string breed, string sex);
+    event DogIsLost(uint indexed tokenId, string addr, uint date);
+    event DogIsFound(uint indexed tokenId, string addr, uint date); 
+    event AddVaccine(uint indexed vacId, string indexed name, uint indexed tokenId, uint vetCentraId, uint date);
+    event MarketPlace(uint indexed tokenId, uint price);
+    event CenterVet(uint indexed vetCentraId, string indexed name);
+
 
     struct Dog {
         string name;
@@ -37,6 +40,7 @@ contract DogBase is DogBaseHelper  {
     }
 
     struct LostDog {
+        uint tokenId;
         uint missingDate;
         uint postalCode;
         string country;
@@ -46,6 +50,7 @@ contract DogBase is DogBaseHelper  {
     }
 
     struct FoundDog {
+        uint tokenId;
         uint foundDate;
         address foundBy;
     }
@@ -78,10 +83,10 @@ contract DogBase is DogBaseHelper  {
 
     VetCenter[] public vetCenters;
     Order[] public market;
+    LostDog [] public lostDogs;
+    FoundDog [] public foundDogs;
 
     mapping(uint => Dog) public dogs;
-    mapping(uint => LostDog []) public lostDogs;
-    mapping(uint => FoundDog[]) public foundDogs;
     mapping(uint => Vaccine []) public vaccines;
     mapping(uint => mapping(uint => address)) public vetCenterOfficials;
     mapping(address => Contact) public contacts;
@@ -108,7 +113,7 @@ contract DogBase is DogBaseHelper  {
      */
     function _newDog(uint _tokenId, Dog memory _dog) internal {
         dogs[_tokenId] = _dog;
-        emit NewDoge(_tokenId, _dog.name);
+        emit NewDoge(_tokenId, dogs[_tokenId].name, dogs[_tokenId].birthday, dogs[_tokenId].breed, dogs[_tokenId].sex);
     }
 
     /**
@@ -133,8 +138,8 @@ contract DogBase is DogBaseHelper  {
     function claimDogIsLost(uint _tokenId, LostDog memory _lostDog) external dogOwner(_tokenId) { 
         require(bytes(dogs[_tokenId].name).length > 0, "This dog has not yet been registered");
         _lostDog.missingDate = block.timestamp;
-        lostDogs[_tokenId].push(_lostDog);
-        emit DogIsLost(_tokenId, dogs[_tokenId].name);
+        lostDogs.push(_lostDog);
+        emit DogIsLost(_tokenId, dogs[_tokenId].addr,_lostDog.missingDate);
     }
 
     /**
@@ -147,8 +152,8 @@ contract DogBase is DogBaseHelper  {
         require(bytes(dogs[_tokenId].name).length > 0, "This dog has not yet been registered");
         _foundDog.foundDate = block.timestamp;
         contacts[_foundDog.foundBy] = _contact;
-        foundDogs[_tokenId].push(_foundDog);
-        emit DogIsFound(_tokenId, dogs[_tokenId].name);
+        foundDogs.push(_foundDog);
+        emit DogIsFound(_tokenId, dogs[_tokenId].addr,_foundDog.foundDate);
     }
 
     /**
@@ -160,7 +165,7 @@ contract DogBase is DogBaseHelper  {
     function addVaccine(uint _tokenId, Vaccine memory _vaccine, uint _doctorId) external dogOwner(_tokenId) {
         require(vetCenterOfficials[_vaccine.vetCenterId][_doctorId] == msg.sender, "Unauthorized vet");
         vaccines[_tokenId].push(_vaccine);
-        emit AddVaccine(vaccines[_tokenId].length - 1, _vaccine.name, _tokenId);
+        emit AddVaccine(vaccines[_tokenId].length - 1, _vaccine.name, _tokenId, _vaccine.vetCenterId, _vaccine.date);
     }
 
     /**
@@ -180,7 +185,9 @@ contract DogBase is DogBaseHelper  {
      */
     function regVetCenter(VetCenter memory _vetCenter) external {
         vetCenters.push(_vetCenter);
-        vetCenterOfficials[vetCenters.length - 1][0] = msg.sender;
+        uint vetCentersId = vetCenters.length - 1;
+        vetCenterOfficials[vetCentersId][0] = msg.sender;
+        emit CenterVet(vetCentersId, vetCenters[vetCentersId].name);
     }
 
     /**
@@ -190,6 +197,7 @@ contract DogBase is DogBaseHelper  {
      */
     function addOrder(uint _price, uint _tokenId) external dogOwner(_tokenId) {
         market.push(Order(_price, _tokenId, msg.sender));
+        emit MarketPlace(_tokenId, _price);
     }
 
     /**

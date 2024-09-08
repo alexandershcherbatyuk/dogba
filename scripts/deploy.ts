@@ -1,11 +1,13 @@
 import { ethers } from "hardhat";
+import { DogBase, DogBase__factory } from "../typechain-types";
 
 async function main() {
-    console.log("Deploing DBT contract...");
+    console.log("Deploing dogBase contract...");
+    let dogBase: DogBase;
 
-    const DBT = await ethers.deployContract("DogBase");
-
-    await DBT.waitForDeployment();
+    const DogBaseFactory = (await ethers.getContractFactory("DogBase")) as DogBase__factory;
+    dogBase = await DogBaseFactory.deploy();
+    await dogBase.waitForDeployment();
 
     let address = [];
 
@@ -67,8 +69,8 @@ async function main() {
             "city": "New York",
             "addr": "123 5th Ave, New York, NY 10001, USA",
             "email": "info@manhattanpetcare.com",
-            "postalCode": "10001",
-            "phone": "+1-212-555-1101"
+            "phone": "+1-212-555-1101",
+            "postalCode": "10001"
         },
         {
             "name": "Toronto Pet Hospital",
@@ -77,8 +79,8 @@ async function main() {
             "city": "Toronto",
             "addr": "456 Bloor St W, Toronto, ON M5S 1X8, Canada",
             "email": "contact@torontopethospital.ca",
-            "postalCode": "M5S 1X8",
-            "phone": "+1-416-555-1202"
+            "phone": "+1-416-555-1202",
+            "postalCode": "M5S 1X8"
         },
         {
             "name": "London Animal Clinic",
@@ -87,8 +89,8 @@ async function main() {
             "city": "London",
             "addr": "789 Oxford St, London W1D 1BS, UK",
             "email": "hello@londonanimalclinic.co.uk",
-            "postalCode": "W1D 1BS",
-            "phone": "+44-20-5555-1303"
+            "phone": "+44-20-5555-1303",
+            "postalCode": "W1D 1BS"
         },
         {
             "name": "Rivoli Vet Care",
@@ -97,8 +99,8 @@ async function main() {
             "city": "Paris",
             "addr": "10 Rue de Rivoli, 75001 Paris, France",
             "email": "support@rivilivetcare.fr",
-            "postalCode": "75001",
-            "phone": "+33-1-5555-1404"
+            "phone": "+33-1-5555-1404",
+            "postalCode": "75001"
         },
         {
             "name": "Berlin Pet Wellness",
@@ -107,8 +109,8 @@ async function main() {
             "city": "Berlin",
             "addr": "12 Kurfürstendamm, 10719 Berlin, Germany",
             "email": "info@berlinpetwellness.de",
-            "postalCode": "10719",
-            "phone": "+49-30-5555-1505"
+            "phone": "+49-30-5555-1505",
+            "postalCode": "10719"
         },
         {
             "name": "Shinjuku Pet Hospital",
@@ -117,8 +119,8 @@ async function main() {
             "city": "Tokyo",
             "addr": "3 Chome-6-1 Shinjuku, Shinjuku City, Tokyo 160-0022, Japan",
             "email": "contact@shinjukupethospital.jp",
-            "postalCode": "160-0022",
-            "phone": "+81-3-5555-1606"
+            "phone": "+81-3-5555-1606",
+            "postalCode": "160-0022"
         },
         {
             "name": "Marine Drive Animal Hospital",
@@ -127,8 +129,8 @@ async function main() {
             "city": "Mumbai",
             "addr": "15 Marine Drive, Mumbai, Maharashtra 400020, India",
             "email": "info@marinedriveanimal.in",
-            "postalCode": "400020",
-            "phone": "+91-22-5555-1707"
+            "phone": "+91-22-5555-1707",
+            "postalCode": "400020"
         },
         {
             "name": "Dongcheng Pet Services",
@@ -137,8 +139,8 @@ async function main() {
             "city": "Beijing",
             "addr": "8 Wangfujing St, Dongcheng, Beijing, 100006, China",
             "email": "service@dongchengpets.cn",
-            "postalCode": "100006",
-            "phone": "+86-10-5555-1808"
+            "phone": "+86-10-5555-1808",
+            "postalCode": "100006"
         },
         {
             "name": "Paulista Vet Clinic",
@@ -147,8 +149,8 @@ async function main() {
             "city": "São Paulo",
             "addr": "500 Av. Paulista, São Paulo - SP, 01311-000, Brazil",
             "email": "contact@paulistavetclinic.com.br",
-            "postalCode": "01311-000",
-            "phone": "+55-1155551909"
+            "phone": "+55-1155551909",
+            "postalCode": "01311-000"
         },
         {
             "name": "Sydney Vet Centre",
@@ -157,8 +159,8 @@ async function main() {
             "city": "Sydney",
             "addr": "100 George St, Sydney NSW 2000, Australia",
             "email": "info@sydneyvetcentre.com.au",
-            "postalCode": "2000",
-            "phone": "+61-2-5555-2010"
+            "phone": "+61-2-5555-2010",
+            "postalCode": "2000"
         }
     ];
     const dog_vaccines = [
@@ -205,7 +207,7 @@ async function main() {
 
 
 
-        await DBT.regDoge(chips[i], {
+        await dogBase.regDoge(chips[i], {
             name: dog_names[Math.floor(0 + Math.random() * 9)],
             species: "dog",
             breed: dog_names[Math.floor(0 + Math.random() * 9)],
@@ -218,13 +220,22 @@ async function main() {
             color: colors[Math.floor(0 + Math.random() * 9)],
             photo: "",
             postalCode: "'" + (Math.floor(100000 + Math.random() * 900000)) + "'",
-            birthday: (Math.floor(1000000000 + Math.random() * 9000000000)),
+            birthday: (Math.floor(Date.now() / 1000) - 1000000),
         }, {
             email: first_names[Math.floor(0 + Math.random() * 9)] + "@gmail.com",
             cellPhone: "+" + (Math.floor(10000000000 + Math.random() * 90000000000)).toString(),
             otherPhone: "+" + (Math.floor(10000000000 + Math.random() * 90000000000)).toString()
         });
-        await DBT.claimDogIsLost(chips[i], {
+
+        await dogBase.regVetCenter(vetCenters[i]);
+    }
+    for (let i = 0; i < chips.length; i++) {
+        let rand = Math.floor(0 + Math.random() * 9);
+        
+
+
+        await dogBase.claimDogIsLost(chips[i], {
+            tokenId : chips[i],
             missingDate: 0,
             postalCode: (Math.floor(100000 + Math.random() * 900000)),
             country: country_codes[rand],
@@ -233,7 +244,8 @@ async function main() {
             addr: addresses[rand],
         });
 
-        await DBT.claimDogIsFound(chips[i], {
+        await dogBase.claimDogIsFound(chips[i], {
+            tokenId : chips[i],
             foundDate: 0,
             foundBy: address[Math.floor(0 + Math.random() * 9)],
 
@@ -243,27 +255,22 @@ async function main() {
             otherPhone: "+" + (Math.floor(10000000000 + Math.random() * 90000000000)).toString(),
         });
 
-        await DBT.regVetCenter(vetCenters[i]);
-        /*let vacId = Math.floor(0 + Math.random() * 9);
+
+        await dogBase.addVaccine(chips[i],{
+            name :  dog_vaccines[i],
+            supplier : vaccine_suppliers[i],
+            code : vaccine_codes[i],
+            vetCenterId : 0,
+            date : Math.floor(Date.now() / 1000) - 1000000,
+            dueDate : Math.floor(Date.now() / 1000) - 1000000,
+          },0);
       
-        await DBT.addVaccine(chips[i],{
-            name :  dog_vaccines[vacId],
-            supplier : vaccine_suppliers[vacId],
-            code : vaccine_codes[vacId],
-            vetCenterId : i,
-            date : (Math.floor(1000000000 + Math.random() * 9000000000)),
-            dueDate : (Math.floor(1000000000 + Math.random() * 9000000000)),
-          },0 );
-      
-        //let dogId = Math.floor(0 + Math.random() * 9);
-        let dogOwner = await DBT.ownerOf(chips[i]);
-        await DBT.addOrder(ethers.parseEther("0.01"),chips[i],dogOwner);
-      */
+        await dogBase.addOrder(ethers.parseEther("0.01"),chips[i]);
 
     }
 
 
-    console.log("Contract address is: " + await DBT.getAddress());
+    console.log("Contract address is: " + await dogBase.getAddress());
 }
 
 // We recommend this pattern to be able to use async/await everywhere
