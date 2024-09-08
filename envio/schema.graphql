@@ -3,6 +3,8 @@ type DogBase_AddVaccine {
   vacId: BigInt!
   name: String!
   tokenId: BigInt!
+  vetCentraId: BigInt!
+  date: BigInt!
 }
 
 type DogBase_Approval {
@@ -19,22 +21,39 @@ type DogBase_ApprovalForAll {
   approved: Boolean!
 }
 
+type DogBase_CenterVet {
+  id: ID!
+  vetCentraId: BigInt!
+  name: String!
+}
+
 type DogBase_DogIsFound {
   id: ID!
   tokenId: BigInt!
-  name: String!
+  addr: String!
+  date: BigInt!
 }
 
 type DogBase_DogIsLost {
   id: ID!
   tokenId: BigInt!
-  name: String!
+  addr: String!
+  date: BigInt!
+}
+
+type DogBase_MarketPlace {
+  id: ID!
+  tokenId: BigInt!
+  price: BigInt!
 }
 
 type DogBase_NewDoge {
   id: ID!
   tokenId: BigInt!
   name: String!
+  birthday: BigInt!
+  breed: String!
+  sex: String!
 }
 
 type DogBase_OwnershipTransferred {
@@ -50,3 +69,20 @@ type DogBase_Transfer {
   tokenId: BigInt!
 }
 
+type DogBase_ActiveDogOwner {
+  id: ID!
+  owner: String!
+  dogId: [ID!]
+}
+
+type DogBase_ActiveLostDod {
+  id: ID!
+  owner: String!
+  dogId: [ID!]
+}
+
+type DogBase_ActiveMarketOrder {
+  id: ID!
+  owner: String!
+  orderId: [ID!]
+}

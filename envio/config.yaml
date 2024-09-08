@@ -8,15 +8,17 @@ networks:
   contracts:
   - name: DogBase
     address:
-    - 0x38087684a0b426c4E6C7Df5ab88746C30a217393
+    - 0x664BB01634bE7A4855F30a7F384bA45080f34bD1
     handler: src/EventHandlers.ts
     events:
-    - event: AddVaccine(uint256 indexed vacId, string indexed name, uint256 indexed tokenId)
+    - event: AddVaccine(uint256 indexed vacId, string indexed name, uint256 indexed tokenId, uint256 vetCentraId, uint256 date)
     - event: Approval(address indexed owner, address indexed approved, uint256 indexed tokenId)
     - event: ApprovalForAll(address indexed owner, address indexed operator, bool approved)
-    - event: DogIsFound(uint256 indexed tokenId, string indexed name)
-    - event: DogIsLost(uint256 indexed tokenId, string indexed name)
-    - event: NewDoge(uint256 indexed tokenId, string indexed name)
+    - event: CenterVet(uint256 indexed vetCentraId, string indexed name)
+    - event: DogIsFound(uint256 indexed tokenId, string addr, uint256 date)
+    - event: DogIsLost(uint256 indexed tokenId, string addr, uint256 date)
+    - event: MarketPlace(uint256 indexed tokenId, uint256 price)
+    - event: NewDoge(uint256 indexed tokenId, string indexed name, uint256 birthday, string breed, string sex)
     - event: OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
     - event: Transfer(address indexed from, address indexed to, uint256 indexed tokenId)
 rollback_on_reorg: false

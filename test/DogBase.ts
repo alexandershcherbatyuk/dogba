@@ -72,7 +72,7 @@ describe("DogBase Contract", function () {
 
         await expect(dogBase.connect(owner).regDoge(1, dog, contact))
             .to.emit(dogBase, "NewDoge")
-            .withArgs(1, dog.name, dog.birthday, dog.breed, dog.sex);
+            .withArgs(1, dog.name, dog.birthday, dog.breed, dog.sex, owner);
     });
 
     it("Should claim a dog as lost", async function () {

@@ -30,6 +30,8 @@ describe("DogBase contract AddVaccine event tests", () => {
       vacId: event.params.vacId,
       name: event.params.name,
       tokenId: event.params.tokenId,
+      vetCentraId: event.params.vetCentraId,
+      date: event.params.date,
     };
     // Asserting that the entity in the mock database is the same as the expected entity
     assert.deepEqual(actualDogBaseAddVaccine, expectedDogBaseAddVaccine, "Actual DogBaseAddVaccine should be the same as the expectedDogBaseAddVaccine");
