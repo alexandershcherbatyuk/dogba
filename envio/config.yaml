@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=./node_modules/envio/evm.schema.json
+name: FirstMorphIndexer
+networks:
+- id: 2810
+  rpc_config:
+    url: https://rpc-quicknode-holesky.morphl2.io
+  start_block: 0
+  contracts:
+  - name: DogBase
+    address:
+    - 0x38087684a0b426c4E6C7Df5ab88746C30a217393
+    handler: src/EventHandlers.ts
+    events:
+    - event: AddVaccine(uint256 indexed vacId, string indexed name, uint256 indexed tokenId)
+    - event: Approval(address indexed owner, address indexed approved, uint256 indexed tokenId)
+    - event: ApprovalForAll(address indexed owner, address indexed operator, bool approved)
+    - event: DogIsFound(uint256 indexed tokenId, string indexed name)
+    - event: DogIsLost(uint256 indexed tokenId, string indexed name)
+    - event: NewDoge(uint256 indexed tokenId, string indexed name)
+    - event: OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
+    - event: Transfer(address indexed from, address indexed to, uint256 indexed tokenId)
+rollback_on_reorg: false

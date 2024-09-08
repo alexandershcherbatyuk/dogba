@@ -1,0 +1,52 @@
+type DogBase_AddVaccine {
+  id: ID!
+  vacId: BigInt!
+  name: String!
+  tokenId: BigInt!
+}
+
+type DogBase_Approval {
+  id: ID!
+  owner: String!
+  approved: String!
+  tokenId: BigInt!
+}
+
+type DogBase_ApprovalForAll {
+  id: ID!
+  owner: String!
+  operator: String!
+  approved: Boolean!
+}
+
+type DogBase_DogIsFound {
+  id: ID!
+  tokenId: BigInt!
+  name: String!
+}
+
+type DogBase_DogIsLost {
+  id: ID!
+  tokenId: BigInt!
+  name: String!
+}
+
+type DogBase_NewDoge {
+  id: ID!
+  tokenId: BigInt!
+  name: String!
+}
+
+type DogBase_OwnershipTransferred {
+  id: ID!
+  previousOwner: String!
+  newOwner: String!
+}
+
+type DogBase_Transfer {
+  id: ID!
+  from: String!
+  to: String!
+  tokenId: BigInt!
+}
+
